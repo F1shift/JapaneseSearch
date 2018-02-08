@@ -3,6 +3,7 @@ using Android.App;
 using Android.Content;
 using Android.Runtime;
 using Android.Views;
+using Android.Views.InputMethods;
 using Android.Webkit;
 using Android.Widget;
 using Android.OS;
@@ -11,7 +12,7 @@ using JapaneseSearch.Models;
 
 namespace JapaneseSearch
 {
-    [Activity(Label = "日本語を調べよう", MainLauncher = true, Theme = "@android:style/Theme.Material")]
+    [Activity(Label = "日本語検索", MainLauncher = true, Theme = "@android:style/Theme.Material")]
     public class MainActivity : Activity
     {
         bool searched = false;
@@ -23,29 +24,30 @@ namespace JapaneseSearch
             webView.Settings.JavaScriptEnabled = true;
 
             //デスクトップ版のウェブサイトに導くため、デスクトップブラウザーのインフォメーションを送る。
-            String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
-            webView.Settings.UserAgentString = newUA;
+            String newUA_desktop = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+            String newUA_mobile = "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36";
+            webView.Settings.UserAgentString = newUA_desktop;
             webView.Settings.BuiltInZoomControls = true;
             webView.Settings.SetSupportZoom(true);
             webView.Settings.DefaultZoom = WebSettings.ZoomDensity.Far;
             webView.SetWebViewClient(new HybridWebViewClient());
 
-            var editText = (EditText)FindViewById<EditText>(Resource.Id.editText);
-            editText.Click += (o, e) =>
+            Action hideKeyboard = new Action(() =>
             {
-                if (searched)
-                {
-                    editText.Text = null;
-                }
-            };
+                InputMethodManager inputManager = (InputMethodManager)GetSystemService(Context.InputMethodService);
+                inputManager.HideSoftInputFromWindow(
+                        this.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
+            });
+
+            var editText = (EditText)FindViewById<EditText>(Resource.Id.editText);
             editText.KeyPress += (o, e) =>
             {
                 if (e.KeyCode == Keycode.Enter ||
                     e.KeyCode == Keycode.Search)
                 {
+                    webView.Settings.UserAgentString = newUA_desktop;
                     webView.LoadUrl("https://dict.hjenglish.com/jp/jc/" + editText.Text);
-                    webView.RequestFocus();
-                    webView.FindFocus();
+                    hideKeyboard();
                 }
                 else
                 {
@@ -57,19 +59,41 @@ namespace JapaneseSearch
             buttonEdo.Click += (o, e) =>
             {
                 if (editText.Text != null)
+                {
+                    webView.Settings.UserAgentString = newUA_desktop;
                     webView.LoadUrl("https://dict.hjenglish.com/jp/jc/" + editText.Text);
+                    hideKeyboard();
+                }
             };
             var buttonIMG = (Button)FindViewById<Button>(Resource.Id.buttonIMG);
             buttonIMG.Click += (o, e) =>
             {
                 if (editText.Text != null)
-                    webView.LoadUrl("https://www.google.co.jp/search?q=" + editText.Text + "&tbm=isch&client=ms-android-htc");
+                {
+                    webView.Settings.UserAgentString = newUA_mobile;
+                    webView.LoadUrl("https://www.google.co.jp/search?q=" + editText.Text + "&tbm=isch");
+                    hideKeyboard();
+                }
             };
             var buttonGoogle = (Button)FindViewById<Button>(Resource.Id.buttonGoogle);
             buttonGoogle.Click += (o, e) =>
             {
                 if (editText.Text != null)
-                    webView.LoadUrl("https://www.google.co.jp/search?q=" + editText.Text + "&client=ms-android-htc");
+                {
+                    webView.Settings.UserAgentString = newUA_mobile;
+                    webView.LoadUrl("https://www.google.co.jp/search?q=" + editText.Text);
+                    hideKeyboard();
+                }
+            };
+            var buttonInverse = (Button)FindViewById<Button>(Resource.Id.buttonInverse);
+            buttonInverse.Click += (o, e) =>
+            {
+                if (editText.Text != null)
+                {
+                    webView.Settings.UserAgentString = newUA_mobile;
+                    webView.LoadUrl("https://www.google.co.jp/search?q=" + editText.Text + "+日文");
+                    hideKeyboard();
+                }
             };
         }
 

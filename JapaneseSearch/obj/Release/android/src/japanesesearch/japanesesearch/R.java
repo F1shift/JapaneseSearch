@@ -17,6 +17,7 @@ public final class R {
         public static final int buttonEdo=0x7f050002;
         public static final int buttonGoogle=0x7f050004;
         public static final int buttonIMG=0x7f050003;
+        public static final int buttonInverse=0x7f050005;
         public static final int editText=0x7f050001;
         public static final int webView=0x7f050000;
     }

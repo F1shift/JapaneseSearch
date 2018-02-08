@@ -69,6 +69,9 @@ namespace JapaneseSearch
 			// aapt resource value: 0x7f050003
 			public const int buttonIMG = 2131034115;
 			
+			// aapt resource value: 0x7f050005
+			public const int buttonInverse = 2131034117;
+			
 			// aapt resource value: 0x7f050001
 			public const int editText = 2131034113;
 			
