@@ -2,6 +2,7 @@
 using Android.App;
 using Android.Content;
 using Android.Runtime;
+using Android.Speech;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Webkit;
@@ -15,14 +16,23 @@ namespace JapaneseSearch
     [Activity(Label = "日本語検索", MainLauncher = true, Theme = "@android:style/Theme.Material")]
     public class MainActivity : Activity
     {
-        bool searched = false;
+        int pressedButtonID;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.Main);
-            var webView = FindViewById<WebView>(Resource.Id.webView);
-            webView.Settings.JavaScriptEnabled = true;
 
+            #region find UI
+            var webView = FindViewById<WebView>(Resource.Id.webView);
+            var editText = FindViewById<EditText>(Resource.Id.editText);
+            var buttonEdo = FindViewById<Button>(Resource.Id.buttonEdo);
+            var buttonIMG = FindViewById<Button>(Resource.Id.buttonIMG);
+            var buttonGoogle = FindViewById<Button>(Resource.Id.buttonGoogle);
+            var buttonInverse = FindViewById<Button>(Resource.Id.buttonInverse);
+            #endregion
+
+            webView.Settings.JavaScriptEnabled = true;
             //デスクトップ版のウェブサイトに導くため、デスクトップブラウザーのインフォメーションを送る。
             String newUA_desktop = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
             String newUA_mobile = "Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36";
@@ -39,7 +49,6 @@ namespace JapaneseSearch
                         this.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
             });
 
-            var editText = (EditText)FindViewById<EditText>(Resource.Id.editText);
             editText.KeyPress += (o, e) =>
             {
                 if (e.KeyCode == Keycode.Enter ||
@@ -54,8 +63,14 @@ namespace JapaneseSearch
                     e.Handled = false;
                 }
             };
+            editText.LongClick += (o, e) =>
+            {
+                InputMethodManager inputManager = (InputMethodManager)GetSystemService(Context.InputMethodService);
+                inputManager.ShowInputMethodPicker();
+                inputManager.ShowSoftInput(editText, ShowFlags.Implicit);
+            };
 
-            var buttonEdo = (Button)FindViewById<Button>(Resource.Id.buttonEdo);
+            #region Set Click Event
             buttonEdo.Click += (o, e) =>
             {
                 if (editText.Text != null)
@@ -65,7 +80,6 @@ namespace JapaneseSearch
                     hideKeyboard();
                 }
             };
-            var buttonIMG = (Button)FindViewById<Button>(Resource.Id.buttonIMG);
             buttonIMG.Click += (o, e) =>
             {
                 if (editText.Text != null)
@@ -75,7 +89,6 @@ namespace JapaneseSearch
                     hideKeyboard();
                 }
             };
-            var buttonGoogle = (Button)FindViewById<Button>(Resource.Id.buttonGoogle);
             buttonGoogle.Click += (o, e) =>
             {
                 if (editText.Text != null)
@@ -85,7 +98,6 @@ namespace JapaneseSearch
                     hideKeyboard();
                 }
             };
-            var buttonInverse = (Button)FindViewById<Button>(Resource.Id.buttonInverse);
             buttonInverse.Click += (o, e) =>
             {
                 if (editText.Text != null)
@@ -95,6 +107,121 @@ namespace JapaneseSearch
                     hideKeyboard();
                 }
             };
+            #endregion
+
+            #region LongClick
+            Action callRecognizerIntent_JPN = 
+                new Action(
+                () =>
+                {
+                    Intent intent = new Intent(
+                        RecognizerIntent.ActionRecognizeSpeech);
+                    intent.PutExtra(RecognizerIntent.ExtraLanguage, "ja-JP");
+
+                    try
+                    {
+                        StartActivityForResult(intent, 1);
+                        editText.Text = "";
+                    }
+                    catch (ActivityNotFoundException a)
+                    {
+                        Toast t = Toast.MakeText(ApplicationContext,
+                                "Opps! Your device doesn't support Speech to Text",
+                                ToastLength.Short);
+                        t.Show();
+                    }
+                }
+                );
+            Action callRecognizerIntent_tCHN = 
+                new Action(
+                () =>
+                {
+                    Intent intent = new Intent(
+                        RecognizerIntent.ActionRecognizeSpeech);
+
+                    intent.PutExtra(RecognizerIntent.ExtraLanguage, "zh-TW");
+
+                    try
+                    {
+                        StartActivityForResult(intent, 1);
+                        editText.Text = "";
+                    }
+                    catch (ActivityNotFoundException a)
+                    {
+                        Toast t = Toast.MakeText(ApplicationContext,
+                                "Opps! Your device doesn't support Speech to Text",
+                                ToastLength.Short);
+                        t.Show();
+                    }
+                }
+                );
+            buttonEdo.LongClick += (o, e) => { pressedButtonID = Resource.Id.buttonEdo; callRecognizerIntent_JPN(); };
+            buttonIMG.LongClick += (o, e) => { pressedButtonID = Resource.Id.buttonIMG; callRecognizerIntent_JPN(); }; ;
+            buttonGoogle.LongClick += (o, e) => { pressedButtonID = Resource.Id.buttonGoogle; callRecognizerIntent_JPN(); }; ;
+            buttonInverse.LongClick += (o, e) => { pressedButtonID = Resource.Id.buttonInverse; callRecognizerIntent_tCHN(); }; ;
+            webView.LongClick += (o, e) =>
+            {
+                Intent intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(webView.Url));
+                StartActivity(intent);
+            };
+            #endregion
+
+            editText.RequestFocus();
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            switch (requestCode)
+            {
+                case 1:
+                    {
+                        if (null != data)
+                        {
+                            System.Collections.Generic.IList<String> text = data.GetStringArrayListExtra(RecognizerIntent.ExtraResults);
+                            Toast t = Toast.MakeText(ApplicationContext,
+                                "Searching...",
+                                ToastLength.Short);
+                            t.Show();
+                            var editText = (EditText)FindViewById<EditText>(Resource.Id.editText);
+                            editText.Text = text[0];
+                            var buttonPressed = FindViewById<Button>(pressedButtonID);
+                            buttonPressed.PerformClick();
+                        }
+                        else
+                        {
+                            Toast t = Toast.MakeText(ApplicationContext,
+                                "Data is null",
+                                ToastLength.Short);
+                            t.Show();
+                        }
+                        break;
+                    }
+
+            }
+        }
+
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back)
+            {
+                var webView = FindViewById<WebView>(Resource.Id.webView);
+                if (webView.CanGoBack())
+                {
+                    webView.GoBack();
+                    return true;
+                }
+                else
+                {
+                    Intent intent = new Intent();
+                    intent.SetAction(Intent.ActionMain);
+                    intent.AddCategory(Intent.CategoryHome);
+                    StartActivity(intent);
+                    return false;
+                }
+            }
+            return false;
         }
 
         public class HybridWebViewClient : WebViewClient

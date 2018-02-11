@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="JapaneseSearch.JapaneseSearch" android:versionCode="1" android:versionName="1.0" android:installLocation="auto">
   <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="26" />
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.BIND_INPUT_METHOD" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <application android:label="JapaneseSearch" android:name="android.app.Application" android:allowBackup="true" android:debuggable="true">
     <activity android:label="日本語検索" android:theme="@android:style/Theme.Material" android:name="md51a57722b7a5711fc187aafe8c3e46e8a.MainActivity">

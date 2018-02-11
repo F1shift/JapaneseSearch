@@ -18,7 +18,6 @@ C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\Japane
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\JapaneseSearch.pdb
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\JapaneseSearch.JapaneseSearch.apk
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\JapaneseSearch.JapaneseSearch-Signed.apk
-C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\JapaneseSearch.csprojResolveAssemblyReference.cache
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\JapaneseSearch.csproj.CoreCompileInputs.cache
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\JapaneseSearch.dll
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\JapaneseSearch.pdb
@@ -30,6 +29,7 @@ C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\R.cs.f
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\uploadflags.txt
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\JapaneseSearch.dll.mdb
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\android\assets\JapaneseSearch.dll.mdb
+C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\obj\Release\JapaneseSearch.csprojResolveAssemblyReference.cache
 C:\Users\formy\Documents\GitHub\JapaneseSearch\JapaneseSearch\bin\Release\JapaneseSearch.dll
 bin\Release\Mono.Android.pdb
 bin\Release\mscorlib.pdb
